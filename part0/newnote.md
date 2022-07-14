@@ -3,12 +3,12 @@
 ```mermaid
 sequenceDiagram
 
-note over browser: the user writes something into the text field and clicks the submit button
+note over browser: the user writes something into the text field<br/>and clicks the submit button
 
 browser->>server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note (with the user data in request body)
 server-->>browser: Response.status: 302
 
-note over server: the server tells to the browser to do an new HTTP GET to specific address
+note over server: the server tells to the browser to do a new HTTP GET to specific address
 
 note over browser: the browser reloads the Notes page causing three more HTTPs request end note
 
