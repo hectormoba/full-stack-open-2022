@@ -1,7 +1,7 @@
 ## Diagram for a single page app
 
 ```mermaid
-sequence Diagram
+sequenceDiagram
 
 browser->>server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/spa
 server-->>browser: HTML-code

@@ -1,6 +1,8 @@
 ## Diagram for a user creates a new note in a Single Page Application (SPA)
 
 ```mermaid
+sequenceDiagram
+
 note over browser: the user writes <br/>something into the text field<br/>and clicks the submit button<br/>The form has no action or method attributes to<br/>define how and where to send the input data
 
 browser->>server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
