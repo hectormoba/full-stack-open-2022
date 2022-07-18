@@ -9,7 +9,6 @@ browser->>server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_s
 browser-->>server: {"content":"test","date":"2022-07-18T19:12:38.202Z"}
 server-->>browser: Response Status: 201 (body: "note created")
 
-note over browser: the browser stays on the <br/>same page
-<br/>and it sends no further HTTP requests
+note over browser: the browser stays on the<br/>same page<br/>and it sends no further HTTP requests
 
 ```
