@@ -3,12 +3,26 @@ import numbersService from "./services/numbers";
 import Filter from "./Filter";
 import PersonForm from "./PersonForm";
 import List from "./List";
+import FeedbackMessage from "./FeedbackMessage";
+import "./index.css";
+
+const getMessageText = (name, type) => {
+  return type === "error"
+    ? `${name} has been already deleted`
+    : type === "update"
+    ? `${name} has been updated successfully`
+    : `${name} has been added successfully`;
+};
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [filter, setNewFilter] = useState("");
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState({
+    error: false,
+    message: null,
+  });
 
   useEffect(() => {
     numbersService.getAll().then((data) => setPersons(data));
@@ -29,13 +43,28 @@ const App = () => {
         let person = { ...personToUpdate, number: newNumber };
 
         let id = personToUpdate.id;
-        numbersService.update(id, person).then((data) => {
-          setPersons(
-            persons.map((person) => (person.id !== id ? person : data))
-          );
-        });
+        numbersService
+          .update(id, person)
+          .then((data) => {
+            setPersons(
+              persons.map((person) => (person.id !== id ? person : data))
+            );
+            setFeedbackMessage({
+              error: false,
+              message: getMessageText(newName, "update"),
+            });
+          })
+          .catch((_) => {
+            setFeedbackMessage({
+              error: true,
+              message: getMessageText(newName, "error"),
+            });
+          });
         setNewName("");
         setNewNumber("");
+        setTimeout(() => {
+          setFeedbackMessage({ eror: false, message: null });
+        }, 3000);
       }
     } else {
       let newObj = {
@@ -49,6 +78,13 @@ const App = () => {
         .then((data) => setPersons(persons.concat(data)));
       setNewName("");
       setNewNumber("");
+      setFeedbackMessage({
+        error: false,
+        message: getMessageText(newName, "create"),
+      });
+      setTimeout(() => {
+        setFeedbackMessage({ eror: false, message: null });
+      }, 3000);
     }
   };
 
@@ -81,6 +117,7 @@ const App = () => {
 
   return (
     <div>
+      <FeedbackMessage feedback={feedbackMessage} />
       <h2>Phonebook</h2>
       <Filter value={filter} handleChange={handleFilterChange} />
       <h2>Add new number</h2>

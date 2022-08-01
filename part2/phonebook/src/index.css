@@ -1,0 +1,30 @@
+:root {
+  --success-color: #2B7A0B;
+  --success-color-bg:#CDE8B9;
+  --error-color: #F44336;
+  --error-color-bg:  #FBC6C2;
+}
+
+.error {
+  border: 2px solid var(--error-color);
+  border-radius: 12px;
+  background-color: var(--error-color-bg);
+  text-align: center;
+}
+
+.onError {
+  color: var(--error-color);
+  font-size: 26px;
+}
+
+.success {
+  border: 2px solid var(--success-color);
+  border-radius: 12px;
+  background-color: var(--success-color-bg);
+  text-align: center;
+}
+
+.onSuccess {
+  color: var(--success-color);
+  font-size: 26px;
+}
