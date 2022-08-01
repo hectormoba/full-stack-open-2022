@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
+import numbersService from "./services/numbers";
 import Filter from "./Filter";
 import PersonForm from "./PersonForm";
-import Persons from "./Persons";
-import axios from "axios";
-
-const API_URL = "http://localhost:3001/persons";
+import List from "./List";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -12,23 +10,62 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
 
+  useEffect(() => {
+    numbersService.getAll().then((data) => setPersons(data));
+  }, []);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     let personAlreadyExists = persons.some((person) => person.name === newName);
 
     if (personAlreadyExists) {
-      alert(`${newName} is already added to the Numberbook`);
+      let personToUpdate = persons.find((person) => person.name === newName);
+
+      let confirmation = window.confirm(
+        `${personToUpdate.name} is already added to phonebook. Do you want to replace the old number with the new one? `
+      );
+
+      if (confirmation) {
+        let person = { ...personToUpdate, number: newNumber };
+
+        let id = personToUpdate.id;
+        numbersService.update(id, person).then((data) => {
+          setPersons(
+            persons.map((person) => (person.id !== id ? person : data))
+          );
+        });
+        setNewName("");
+        setNewNumber("");
+      }
     } else {
-      let newObj = { name: newName, number: newNumber, id: persons.length + 1 };
-      setPersons(persons.concat(newObj));
+      let newObj = {
+        name: newName,
+        number: newNumber,
+        id: persons[persons.length - 1].id + 1,
+      };
+
+      numbersService
+        .create(newObj)
+        .then((data) => setPersons(persons.concat(data)));
       setNewName("");
       setNewNumber("");
     }
   };
 
-  useEffect(() => {
-    axios.get(API_URL).then((response) => setPersons(response.data));
-  }, []);
+  const handleClickonDelete = (id) => {
+    let personName = persons.filter((person) => person.id === id)[0].name;
+
+    let confirmation = window.confirm(`Do you want to delete ${personName}?`);
+
+    if (confirmation) {
+      numbersService
+        .del(id)
+        .then((_) => {
+          setPersons(persons.filter((person) => person.id !== id));
+        })
+        .catch((err) => console.log(err));
+    }
+  };
 
   const handleFilterChange = (event) => {
     setNewFilter(event.target.value);
@@ -55,7 +92,11 @@ const App = () => {
         inputNumberValue={newNumber}
       />
       <h2>Numbers</h2>
-      <Persons persons={persons} filter={filter} />
+      <List
+        persons={persons}
+        filter={filter}
+        handleClick={handleClickonDelete}
+      />
     </div>
   );
 };

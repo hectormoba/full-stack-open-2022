@@ -1,4 +1,6 @@
-const Persons = ({ persons, filter }) => {
+import ListItem from "./ListItem";
+
+const List = ({ persons, filter, handleClick }) => {
   const toShow =
     filter.length === 0
       ? persons
@@ -7,12 +9,10 @@ const Persons = ({ persons, filter }) => {
   return (
     <>
       {toShow.map((person) => (
-        <p key={person.id}>
-          {person.name} {person.number}
-        </p>
+        <ListItem key={person.id} person={person} handleClick={handleClick} />
       ))}
     </>
   );
 };
 
-export default Persons;
+export default List;
