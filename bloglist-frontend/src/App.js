@@ -15,12 +15,19 @@ const App = () => {
   const [showMessage, setShowMessage] = useState(false)
   const [messageType, setMesageType] = useState('')
   const [message, setMessage] = useState('')
+  const [createFormIsOpen, setCreateFormIsOpen] = useState(false)
 
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
+
+    const getBlogsAndSort = async () => {
+
+      const res = await blogService.getAll()
+      const sortedBlogs = [...res].sort( (a, z) => z.likes - a.likes)
+      setBlogs(sortedBlogs)
+    }
+
+    getBlogsAndSort()
   }, [])
 
   useEffect(() => {
@@ -58,13 +65,14 @@ const App = () => {
 
   const sendBlogInfo = async (title, author, url) => {
     try {
-      let response = await blogService.createBlog({ title, author, url})
+      let response = await blogService.createBlog({ title, author, url })
       if (response.status === 201) {
         let updatedBlogs = await blogService.getAll()
         setShowMessage(true)
         setMesageType('succeeded')
         setMessage(title)
         setBlogs(updatedBlogs)
+        setCreateFormIsOpen(false)
       }
     } catch(error) {
       setShowMessage(true)
@@ -79,26 +87,32 @@ const App = () => {
         message={message}
         type={messageType}
         showMessage={showMessage}
-        setShowMessage={setShowMessage} 
+        setShowMessage={setShowMessage}
       />
       { user === null
         ? <LoginFrom
-            username={username}
-            password={password}
-            setUsername={setUsername}
-            setPassword={setPassword}
-            handleLogin={handleLogin}   
-          />
+          username={username}
+          password={password}
+          setUsername={setUsername}
+          setPassword={setPassword}
+          handleLogin={handleLogin}
+        />
         : (
           <>
-            <BlogsRender 
-              blogs={blogs}
-              user={user}
-              handleLogout={handleLogout}
+            <span>{user.username} is logged in</span>{' '}
+            <button onClick={handleLogout}>Logout</button>
+            <h2>blogs</h2>
+            <CreateBlogForm
+              sendBlogInfo={sendBlogInfo}
+              isOpen={createFormIsOpen}
+              handleOpen={setCreateFormIsOpen}
             />
-            <CreateBlogForm sendBlogInfo={sendBlogInfo} />
+            <BlogsRender
+              blogs={blogs}
+              loggedUsername={user.username}
+            />
           </>
-          )
+        )
       }
     </div>
   )

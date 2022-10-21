@@ -1,17 +1,20 @@
-import React from "react";
-import Blog from "./Blog";
+import React from 'react'
+import Blog from './Blog'
 
 
-const BlogsRender = ({blogs, handleLogout, user}) => {
+const BlogsRender = ({ blogs, loggedUsername }) => {
+
+  const styles = {
+    blogWrapper: {
+      padding: '10px 10vw',
+    }
+  }
   return (
-    <>
-      <button onClick={handleLogout}>Logout</button>
-      <p>{user.username} is logged in</p>
-      <h2>blogs</h2>
+    <main style={styles.blogWrapper}>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} loggedUsername={loggedUsername}/>
       )}
-    </>
+    </main>
   )
 }
 
