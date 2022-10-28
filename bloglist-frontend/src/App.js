@@ -16,10 +16,10 @@ const App = () => {
   const [messageType, setMesageType] = useState('')
   const [message, setMessage] = useState('')
   const [createFormIsOpen, setCreateFormIsOpen] = useState(false)
-
+  const [updateBlogList, setUpdateBlogList] = useState(false)
+  const [blogsComponentIsVisible, setBlogsComponentIsVisible] = useState(false)
 
   useEffect(() => {
-
     const getBlogsAndSort = async () => {
 
       const res = await blogService.getAll()
@@ -27,8 +27,15 @@ const App = () => {
       setBlogs(sortedBlogs)
     }
 
-    getBlogsAndSort()
-  }, [])
+    if(blogsComponentIsVisible) {
+      getBlogsAndSort()
+    }
+
+    if(updateBlogList) {
+      setUpdateBlogList(false)
+    }
+
+  }, [updateBlogList, blogsComponentIsVisible])
 
   useEffect(() => {
     const userInLocalStorage = localStorage.getItem('user')
@@ -36,6 +43,7 @@ const App = () => {
     if (userInLocalStorage) {
       const user = JSON.parse(userInLocalStorage)
       setUser(user)
+      setBlogsComponentIsVisible(true)
       blogService.setToken(user.token)
     }
   }, [])
@@ -50,6 +58,7 @@ const App = () => {
       blogService.setToken(user.token)
       setPassword('')
       setUsername('')
+      setBlogsComponentIsVisible(true)
       localStorage.setItem('user', JSON.stringify(user))
     } catch (error) {
       setShowMessage(true)
@@ -61,18 +70,18 @@ const App = () => {
   const handleLogout = () => {
     localStorage.removeItem('user')
     setUser(null)
+    setBlogsComponentIsVisible(false)
   }
 
-  const sendBlogInfo = async (title, author, url) => {
+  const sendBlogInfoAndReload = async (title, author, url) => {
     try {
       let response = await blogService.createBlog({ title, author, url })
       if (response.status === 201) {
-        let updatedBlogs = await blogService.getAll()
         setShowMessage(true)
         setMesageType('succeeded')
         setMessage(title)
-        setBlogs(updatedBlogs)
         setCreateFormIsOpen(false)
+        setUpdateBlogList(true)
       }
     } catch(error) {
       setShowMessage(true)
@@ -103,12 +112,14 @@ const App = () => {
             <button onClick={handleLogout}>Logout</button>
             <h2>blogs</h2>
             <CreateBlogForm
-              sendBlogInfo={sendBlogInfo}
+              sendBlogInfoAndReload={sendBlogInfoAndReload}
               isOpen={createFormIsOpen}
               handleOpen={setCreateFormIsOpen}
+              reloadBlogList={setUpdateBlogList}
             />
             <BlogsRender
               blogs={blogs}
+              reloadBlogList={setUpdateBlogList}
               loggedUsername={user.username}
             />
           </>

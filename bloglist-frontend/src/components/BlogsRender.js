@@ -2,7 +2,7 @@ import React from 'react'
 import Blog from './Blog'
 
 
-const BlogsRender = ({ blogs, loggedUsername }) => {
+const BlogsRender = ({ blogs, loggedUsername, reloadBlogList }) => {
 
   const styles = {
     blogWrapper: {
@@ -12,7 +12,12 @@ const BlogsRender = ({ blogs, loggedUsername }) => {
   return (
     <main style={styles.blogWrapper}>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} loggedUsername={loggedUsername}/>
+        <Blog
+          key={blog.id}
+          blog={blog}
+          loggedUsername={loggedUsername}
+          reloadBlogList={reloadBlogList}
+        />
       )}
     </main>
   )
