@@ -1,9 +1,9 @@
 import { useDispatch } from "react-redux"
 import { displayNotification } from "../reducers/notificationReducer"
-import { vote } from '../reducers/anecdoteReducer'
+import { upvoteAnAnecdote } from '../reducers/anecdoteReducer'
 
 const AnecdoteItem = ({ anecdote }) => {
-  const { id, votes, content } = anecdote 
+  const { votes, content } = anecdote 
   const dispatch = useDispatch()
 
   return (
@@ -14,7 +14,7 @@ const AnecdoteItem = ({ anecdote }) => {
     <div>
       has {votes}
       <button onClick={() => {
-        dispatch(vote(id))
+        dispatch(upvoteAnAnecdote(anecdote))
         dispatch(displayNotification(content))
       }}>vote</button>
     </div>
