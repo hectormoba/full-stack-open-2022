@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux"
-import { displayNotification } from "../reducers/notificationReducer"
+import { setNotification } from "../reducers/notificationReducer"
 import { upvoteAnAnecdote } from '../reducers/anecdoteReducer'
 
 const AnecdoteItem = ({ anecdote }) => {
@@ -15,7 +15,7 @@ const AnecdoteItem = ({ anecdote }) => {
       has {votes}
       <button onClick={() => {
         dispatch(upvoteAnAnecdote(anecdote))
-        dispatch(displayNotification(content))
+        dispatch(setNotification(content, 3))
       }}>vote</button>
     </div>
   </div>
