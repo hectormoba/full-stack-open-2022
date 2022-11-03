@@ -1,40 +1,30 @@
-import { resetNotificationState } from "../reducers/notificationReducer"
-import { useDispatch, useSelector } from "react-redux"
-import { isStatePopulated } from "./utils"
-import { useEffect, useMemo } from "react"
+import { connect } from "react-redux"
 
-
-const Notification = () => {
+const Notification = (props) => {
   const style = {
     border: 'solid',
     padding: 10,
     borderWidth: 1
   }
 
-  const dispatch = useDispatch()
-  const notification = useSelector(({ notification }) => notification)
-
-  const memoizedValue = useMemo(
-    () => isStatePopulated(notification),
-    [notification]
-  )
-
-  useEffect(() => {
-    if(memoizedValue) {
-      const timeoutId = setTimeout(() => {
-        dispatch(resetNotificationState())
-      }, 5000)
-      return () => clearTimeout(timeoutId)
-    }
-  },[memoizedValue, dispatch])
+  console.log('content:', props.notification.content)
+  console.log('timerId:', props.notification.timerId)
 
   return (
-    memoizedValue
+    (props.notification.content !== '' && props.notification.timerId !== '')
       ? (<div style={style}>
-          <p>{` you vote ${notification}`}</p>
+          <p>{` you vote ${props.notification.content}`}</p>
         </div>)
       : null
   )
 }
+const mapStateToProps = (state) => ({
+  notification: state.notification
+})
 
-export default Notification
+const ConnectedNotification = connect(
+  mapStateToProps,
+  null
+)(Notification)
+
+export default ConnectedNotification
