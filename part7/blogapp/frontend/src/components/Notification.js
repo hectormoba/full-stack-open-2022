@@ -25,7 +25,7 @@ const Notification = () => {
 };
 
 function isNotificationEmpty(notification) {
-  return !Boolean(notification.type && notification.message);
+  return !(notification.type && notification.message);
 }
 
 export default Notification;

@@ -1,72 +1,65 @@
-import { useState, useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   pushNotification,
   resetNotification,
 } from "./store/slices/notificationSlice";
+import {
+  fetchBlogs,
+  createBlogThunk,
+  deleteBlogById,
+} from "./store/slices/blogsSlice";
+import {
+  storeUserInfo,
+  getUserAndUpdateState,
+  deleteStoredUserInfo,
+} from "./store/slices/userSlice";
+import { isUserEmpty } from "./utils";
 import Blog from "./components/Blog";
 import LoginForm from "./components/LoginForm";
 import NewBlogForm from "./components/NewBlogForm";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
-
 import blogService from "./services/blogs";
 import loginService from "./services/login";
-import userService from "./services/user";
 
 const App = () => {
   const dispatch = useDispatch();
-  const [blogs, setBlogs] = useState([]);
-  const [user, setUser] = useState(null);
+  const user = useSelector((state) => state.user);
+  const blogs = useSelector((state) => state.blogs);
   const blogFormRef = useRef();
-  const byLikes = (b1, b2) => (b2.likes > b1.likes ? 1 : -1);
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs.sort(byLikes)));
-  }, []);
+    dispatch(fetchBlogs());
+  }, [dispatch]);
 
   useEffect(() => {
-    const userFromStorage = userService.getUser();
-    if (userFromStorage) {
-      setUser(userFromStorage);
-    }
+    dispatch(getUserAndUpdateState());
   }, []);
 
   const login = async (username, password) => {
-    loginService
-      .login({
-        username,
-        password,
-      })
-      .then((user) => {
-        setUser(user);
-        userService.setUser(user);
-        notify(`${user.name} logged in!`);
-      })
-      .catch(() => {
-        notify("wrong username/password", "alert");
-      });
+    try {
+      const loggedUser = await loginService.login({ username, password });
+      dispatch(storeUserInfo(loggedUser));
+      notify(`${loggedUser.name} logged in!`);
+    } catch (error) {
+      notify("wrong username/password", "alert");
+    }
   };
 
   const logout = () => {
-    setUser(null);
-    userService.clearUser();
+    dispatch(deleteStoredUserInfo());
     notify("good bye!");
   };
 
-  const createBlog = async (blog) => {
-    blogService
-      .create(blog)
-      .then((createdBlog) => {
-        notify(
-          `a new blog '${createdBlog.title}' by ${createdBlog.author} added`
-        );
-        setBlogs(blogs.concat(createdBlog));
-        blogFormRef.current.toggleVisibility();
-      })
-      .catch((error) => {
-        notify("creating a blog failed: " + error.response.data.error, "alert");
-      });
+  const createBlog = (blog) => {
+    try {
+      dispatch(createBlogThunk(blog));
+      notify(`a new blog '${blog.title}' by ${blog.author} added`);
+      blogFormRef.current.toggleVisibility();
+    } catch (error) {
+      notify("creating a blog failed: " + error.response.data.error, "alert");
+    }
   };
 
   const removeBlog = (id) => {
@@ -80,10 +73,7 @@ const App = () => {
       return;
     }
 
-    blogService.remove(id).then(() => {
-      const updatedBlogs = blogs.filter((b) => b.id !== id).sort(byLikes);
-      setBlogs(updatedBlogs);
-    });
+    dispatch(deleteBlogById(id));
   };
 
   const likeBlog = async (id) => {
@@ -96,10 +86,10 @@ const App = () => {
 
     blogService.update(liked.id, liked).then((updatedBlog) => {
       notify(`you liked '${updatedBlog.title}' by ${updatedBlog.author}`);
-      const updatedBlogs = blogs
-        .map((b) => (b.id === id ? updatedBlog : b))
-        .sort(byLikes);
-      setBlogs(updatedBlogs);
+      // const updatedBlogs = blogs
+      // .map((b) => (b.id === id ? updatedBlog : b))
+      // .sort(byLikes);
+      // setBlogs(updatedBlogs);
     });
   };
 
@@ -110,7 +100,7 @@ const App = () => {
     }, 5000);
   };
 
-  if (user === null) {
+  if (isUserEmpty(user)) {
     return (
       <>
         <Notification />
@@ -135,15 +125,17 @@ const App = () => {
       </Togglable>
 
       <div id="blogs">
-        {blogs.map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            likeBlog={likeBlog}
-            removeBlog={removeBlog}
-            user={user}
-          />
-        ))}
+        {blogs.map((blog) => {
+          return (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              likeBlog={likeBlog}
+              removeBlog={removeBlog}
+              user={user}
+            />
+          );
+        })}
       </div>
     </div>
   );
