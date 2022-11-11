@@ -8,19 +8,19 @@ import {
   fetchBlogs,
   createBlogThunk,
   deleteBlogById,
+  updateBlogThunk,
 } from "./store/slices/blogsSlice";
 import {
   storeUserInfo,
   getUserAndUpdateState,
   deleteStoredUserInfo,
 } from "./store/slices/userSlice";
-import { isUserEmpty } from "./utils";
+import { isUserEmpty, findBlogToUpdate } from "./utils";
 import Blog from "./components/Blog";
 import LoginForm from "./components/LoginForm";
 import NewBlogForm from "./components/NewBlogForm";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
-import blogService from "./services/blogs";
 import loginService from "./services/login";
 
 const App = () => {
@@ -35,7 +35,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(getUserAndUpdateState());
-  }, []);
+  }, [dispatch]);
 
   const login = async (username, password) => {
     try {
@@ -76,21 +76,12 @@ const App = () => {
     dispatch(deleteBlogById(id));
   };
 
-  const likeBlog = async (id) => {
-    const toLike = blogs.find((b) => b.id === id);
-    const liked = {
-      ...toLike,
-      likes: (toLike.likes || 0) + 1,
-      user: toLike.user.id,
-    };
-
-    blogService.update(liked.id, liked).then((updatedBlog) => {
-      notify(`you liked '${updatedBlog.title}' by ${updatedBlog.author}`);
-      // const updatedBlogs = blogs
-      // .map((b) => (b.id === id ? updatedBlog : b))
-      // .sort(byLikes);
-      // setBlogs(updatedBlogs);
-    });
+  const likeBlog = (id) => {
+    const blogToUpdate = findBlogToUpdate(blogs, id);
+    const fieldToUpdate = { likes: blogToUpdate.likes + 1 };
+    dispatch(updateBlogThunk(blogToUpdate, fieldToUpdate));
+    dispatch(fetchBlogs());
+    notify(`you liked '${blogToUpdate.title}' by ${blogToUpdate.author}`);
   };
 
   const notify = (message, type = "info") => {

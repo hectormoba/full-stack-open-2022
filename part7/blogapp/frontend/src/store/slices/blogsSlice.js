@@ -15,22 +15,23 @@ const blogSlice = createSlice({
       const id = action.payload;
       return state.filter((blog) => blog.id !== id);
     },
+    updateBlog(state, action) {
+      const id = action.payload.id;
+      const newBlog = action.payload;
+      return state.map((blog) => (blog.id === id ? newBlog : blog));
+    },
   },
 });
 
-const { updateBlogs, createBlog, deleteBlog } = blogSlice.actions;
+const { updateBlogs, createBlog, deleteBlog, updateBlog } = blogSlice.actions;
 
 const byLikes = (a, z) => z.likes - a.likes;
 
-const getAllThunk = async (dispatch) => {
-  const response = await blogs.getAll();
-  response.sort(byLikes);
-  dispatch(updateBlogs(response));
-};
-
 export const fetchBlogs = () => {
   return async (dispatch) => {
-    await getAllThunk(dispatch);
+    const response = await blogs.getAll();
+    response.sort(byLikes);
+    dispatch(updateBlogs(response));
   };
 };
 
@@ -47,6 +48,19 @@ export const deleteBlogById = (id) => {
     const token = getState().user.token;
     await blogs.remove(id, token);
     dispatch(deleteBlog(id));
+  };
+};
+
+export const updateBlogThunk = (blogToUpdate, newObj) => {
+  return async (dispatch) => {
+    const id = blogToUpdate.id;
+    const updatedBlog = {
+      ...blogToUpdate,
+      ...newObj,
+    };
+
+    await blogs.update(id, updatedBlog);
+    dispatch(updateBlog(updatedBlog));
   };
 };
 
