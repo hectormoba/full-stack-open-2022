@@ -1,69 +1,54 @@
-import { useState } from "react";
-import PropTypes from "prop-types";
+import { useSelector, useDispatch } from "react-redux";
+import { updateBlogThunk, addACommentThunk } from "../store/slices/blogsSlice";
+import { useParams } from "react-router";
+import { notify } from "../store/utils";
+import { likeOrLikes } from "../utils";
+import CommentSection from "./CommentSection";
 
-const BlogDetails = ({ blog, visible, likeBlog, removeBlog, own }) => {
-  if (!visible) return null;
+const Blog = () => {
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const blog = useSelector((state) => {
+    const blogsArrray = state.blogs;
+    return blogsArrray.filter((blog) => blog.id === id)[0];
+  });
 
-  const addedBy = blog.user && blog.user.name ? blog.user.name : "anonymous";
-
-  return (
-    <div>
-      <div>
-        <a href={blog.url}>{blog.url}</a>
-      </div>
-      <div>
-        {blog.likes} likes{" "}
-        <button onClick={() => likeBlog(blog.id)}>like</button>
-      </div>
-      {addedBy}
-      {own && <button onClick={() => removeBlog(blog.id)}>remove</button>}
-    </div>
-  );
-};
-
-const Blog = ({ blog, likeBlog, removeBlog, user }) => {
-  const [visible, setVisible] = useState(false);
-
-  const style = {
-    padding: 3,
-    margin: 5,
-    borderStyle: "solid",
-    borderWidth: 1,
+  const likeBlog = () => {
+    const fieldToUpdate = { likes: blog.likes + 1 };
+    dispatch(updateBlogThunk(blog, fieldToUpdate));
+    notify(dispatch, `you liked '${blog.title}' by ${blog.author}`);
   };
 
-  return (
-    <div style={style} className="blog">
-      {blog.title} {blog.author}
-      <button onClick={() => setVisible(!visible)}>
-        {visible ? "hide" : "view"}
-      </button>
-      <BlogDetails
-        blog={blog}
-        visible={visible}
-        likeBlog={likeBlog}
-        removeBlog={removeBlog}
-        own={blog.user && user.username === blog.user.username}
-      />
-    </div>
-  );
-};
+  const addComment = (input) => {
+    dispatch(
+      addACommentThunk({
+        comment: input,
+        blog,
+      })
+    );
+  };
 
-Blog.propTypes = {
-  blog: PropTypes.shape({
-    title: PropTypes.string.isRequired,
-    author: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired,
-    likes: PropTypes.number.isRequired,
-    user: PropTypes.shape({
-      username: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    }),
-  }).isRequired,
-  user: PropTypes.shape({
-    username: PropTypes.string.isRequired,
-  }),
-  likeBlog: PropTypes.func.isRequired,
-  removeBlog: PropTypes.func.isRequired,
+  if (!blog) {
+    return null;
+  }
+
+  const { title, author, likes, url, comments, user } = blog;
+
+  return (
+    <section>
+      <h2>{title}</h2>
+      <h3>by {author}</h3>
+      <p>{url}</p>
+      <div>
+        <span>
+          {likes} {likeOrLikes(likes)}
+        </span>
+        <button onClick={likeBlog}>like</button>
+      </div>
+      <p>added by {user ? user.name : "no user"}</p>
+      <CommentSection addComment={addComment} comments={comments} />
+    </section>
+  );
 };
 
 export default Blog;

@@ -7,5 +7,9 @@ export function findBlogToUpdate(blogs, id) {
 }
 
 export function isArrayEmpty(array) {
-  return array.lenght > 0;
+  return array.length === 0;
+}
+
+export function likeOrLikes(likes) {
+  return likes === 1 ? "like" : "likes";
 }

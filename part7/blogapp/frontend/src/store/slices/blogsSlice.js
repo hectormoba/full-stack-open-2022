@@ -64,5 +64,14 @@ export const updateBlogThunk = (blogToUpdate, newObj) => {
   };
 };
 
+export const addACommentThunk = (data) => {
+  return async (dispatch, getState) => {
+    const id = data.blog.id;
+    const token = getState().loggedUser.token;
+    const newBlog = await blogs.pushNewComment(id, data, token);
+    dispatch(updateBlog(newBlog.data));
+  };
+};
+
 export { updateBlogs, createBlog };
 export default blogSlice.reducer;

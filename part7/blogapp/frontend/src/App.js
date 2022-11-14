@@ -5,11 +5,9 @@ import { isUserEmpty } from "./utils";
 import {
   storeUserInfo,
   getUserAndUpdateState,
+  deleteStoredUserInfo,
 } from "./store/slices/loggedUserSlice";
-import {
-  pushNotification,
-  resetNotification,
-} from "./store/slices/notificationSlice";
+import { notify } from "./store/utils";
 import loginService from "./services/login";
 import Notification from "./components/Notification";
 import LoginForm from "./components/LoginForm";
@@ -27,17 +25,15 @@ const App = () => {
     try {
       const loggedUser = await loginService.login({ username, password });
       dispatch(storeUserInfo(loggedUser));
-      notify(`${loggedUser.name} logged in!`);
+      notify(dispatch, `${loggedUser.name} logged in!`);
     } catch (error) {
-      notify("wrong username/password", "alert");
+      notify(dispatch, "wrong username/password", "alert");
     }
   };
 
-  const notify = (message, type = "info") => {
-    dispatch(pushNotification({ message, type }));
-    setTimeout(() => {
-      dispatch(resetNotification());
-    }, 5000);
+  const logout = () => {
+    dispatch(deleteStoredUserInfo());
+    notify(dispatch, "good bye!");
   };
 
   if (isUserEmpty(loggedUser)) {
@@ -52,6 +48,12 @@ const App = () => {
   return (
     <>
       <NavList />
+      <Notification />
+      <h2>blogs</h2>
+      <div>
+        {loggedUser.name} logged in
+        <button onClick={logout}>logout</button>
+      </div>
       <Outlet />
     </>
   );
