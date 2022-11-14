@@ -1,24 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
-import userService from "../../services/user";
+import loggedUserService from "../../services/loggedUser";
 
 const InitialUserState = { token: "", user: "", username: "" };
 
-const userSlice = createSlice({
+const logedUserSlice = createSlice({
   name: "user",
   initialState: InitialUserState,
   reducers: {
     storeUserInfo(state, action) {
-      userService.setUser(action.payload);
+      loggedUserService.setUser(action.payload);
       return action.payload;
     },
     deleteStoredUserInfo() {
-      userService.clearUser();
+      loggedUserService.clearUser();
       return InitialUserState;
     },
     getUserAndUpdateState() {
-      const user = userService.getUser();
+      const user = loggedUserService.getUser();
       if (user) {
-        userService.setUser(user);
+        loggedUserService.setUser(user);
       }
       return user ?? InitialUserState;
     },
@@ -33,6 +33,6 @@ export const {
   deleteStoredUserInfo,
   getUserAndUpdateState,
   getToken,
-} = userSlice.actions;
+} = logedUserSlice.actions;
 
-export default userSlice.reducer;
+export default logedUserSlice.reducer;

@@ -5,3 +5,7 @@ export function isUserEmpty(user) {
 export function findBlogToUpdate(blogs, id) {
   return blogs.find((blog) => blog.id === id);
 }
+
+export function isArrayEmpty(array) {
+  return array.lenght > 0;
+}

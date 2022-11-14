@@ -37,7 +37,7 @@ export const fetchBlogs = () => {
 
 export const createBlogThunk = (newBlog) => {
   return async (dispatch, getState) => {
-    const token = getState().user.token;
+    const token = getState().loggedUser.token;
     const response = await blogs.create(newBlog, token);
     dispatch(createBlog(response));
   };
@@ -45,7 +45,7 @@ export const createBlogThunk = (newBlog) => {
 
 export const deleteBlogById = (id) => {
   return async (dispatch, getState) => {
-    const token = getState().user.token;
+    const token = getState().loggedUser.token;
     await blogs.remove(id, token);
     dispatch(deleteBlog(id));
   };
