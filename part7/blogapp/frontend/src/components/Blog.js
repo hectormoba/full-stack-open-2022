@@ -4,6 +4,8 @@ import { useParams } from "react-router";
 import { notify } from "../store/utils";
 import { likeOrLikes } from "../utils";
 import CommentSection from "./CommentSection";
+import { InnerOutletContainer } from "./styled/Containers.styled";
+import Button from "./styled/Button.styled";
 
 const Blog = () => {
   const { id } = useParams();
@@ -35,19 +37,21 @@ const Blog = () => {
   const { title, author, likes, url, comments, user } = blog;
 
   return (
-    <section>
+    <InnerOutletContainer>
       <h2>{title}</h2>
       <h3>by {author}</h3>
       <p>{url}</p>
-      <div>
+      <Button.Container>
         <span>
           {likes} {likeOrLikes(likes)}
         </span>
-        <button onClick={likeBlog}>like</button>
-      </div>
+        <Button secondary onClick={likeBlog}>
+          like
+        </Button>
+      </Button.Container>
       <p>added by {user ? user.name : "no user"}</p>
       <CommentSection addComment={addComment} comments={comments} />
-    </section>
+    </InnerOutletContainer>
   );
 };
 

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import Form from "./styled/Form.styled";
+import Button from "./styled/Button.styled";
 
 const NewBlogForm = ({ onCreate }) => {
   const [title, setTitle] = useState("");
@@ -17,38 +19,38 @@ const NewBlogForm = ({ onCreate }) => {
     <div>
       <h2>Create new</h2>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          title
-          <input
+      <Form onSubmit={handleSubmit}>
+        <Form.InputContainer>
+          <Form.Label>title</Form.Label>
+          <Form.Input
             value={title}
             onChange={({ target }) => setTitle(target.value)}
             id="title"
             placeholder="title of the blog"
           />
-        </div>
-        <div>
-          author
-          <input
+        </Form.InputContainer>
+        <Form.InputContainer>
+          <Form.Label>author</Form.Label>
+          <Form.Input
             value={author}
             onChange={({ target }) => setAuthor(target.value)}
             id="author"
             placeholder="author of the blog"
           />
-        </div>
-        <div>
-          url
-          <input
+        </Form.InputContainer>
+        <Form.InputContainer>
+          <Form.Label>url</Form.Label>
+          <Form.Input
             value={url}
             onChange={({ target }) => setUrl(target.value)}
             id="url"
             placeholder="url of the blog"
           />
-        </div>
-        <button id="create-butto" type="submit">
+        </Form.InputContainer>
+        <Button main id="create-butto" type="submit">
           create
-        </button>
-      </form>
+        </Button>
+      </Form>
     </div>
   );
 };

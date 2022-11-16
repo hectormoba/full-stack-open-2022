@@ -9,6 +9,7 @@ import {
 } from "./store/slices/loggedUserSlice";
 import { notify } from "./store/utils";
 import loginService from "./services/login";
+import { OutletContainer } from "./components/styled/Containers.styled";
 import Notification from "./components/Notification";
 import LoginForm from "./components/LoginForm";
 import NavList from "./components/NavList";
@@ -47,14 +48,11 @@ const App = () => {
 
   return (
     <>
-      <NavList />
+      <NavList nameDisplayed={loggedUser.name} logout={logout} />
       <Notification />
-      <h2>blogs</h2>
-      <div>
-        {loggedUser.name} logged in
-        <button onClick={logout}>logout</button>
-      </div>
-      <Outlet />
+      <OutletContainer>
+        <Outlet />
+      </OutletContainer>
     </>
   );
 };

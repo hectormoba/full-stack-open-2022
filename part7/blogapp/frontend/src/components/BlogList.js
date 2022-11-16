@@ -4,17 +4,14 @@ import { fetchBlogs, createBlogThunk } from "../store/slices/blogsSlice";
 import { Link } from "react-router-dom";
 import { notify } from "../store/utils";
 import NewBlogForm from "./NewBlogForm";
+import {
+  InnerOutletContainer,
+  BlogListElementContainer,
+  BlogListContainer,
+} from "./styled/Containers.styled";
 import Togglable from "./Togglable";
 
 const BlogList = () => {
-  const style = {
-    padding: "8px 5px",
-    margin: 5,
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderRadius: 5,
-  };
-
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs);
   const blogFormRef = useRef();
@@ -38,22 +35,23 @@ const BlogList = () => {
   };
 
   return (
-    <>
+    <InnerOutletContainer>
+      <h2>Blogs</h2>
       <Togglable buttonLabel="new note" ref={blogFormRef}>
         <NewBlogForm onCreate={createBlog} />
       </Togglable>
-      <div id="blogs">
+      <BlogListContainer id="blogs">
         {blogs.map((blog) => {
           return (
-            <div style={style} key={blog.id}>
+            <BlogListElementContainer key={blog.id}>
               <Link
                 to={`/blogs/${blog.id}`}
               >{`${blog.title} by ${blog.author}`}</Link>
-            </div>
+            </BlogListElementContainer>
           );
         })}
-      </div>
-    </>
+      </BlogListContainer>
+    </InnerOutletContainer>
   );
 };
 
